@@ -19,29 +19,168 @@ include __DIR__ . '/../inc/sidebar.php';
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="h3 mb-0">Dashboard</h1>
-                        <p class="text-muted mb-0">Welcome back! Here's what's happening.</p>
+                        <h1 class="h3 mb-0">
+                            <?php 
+                            if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
+                                echo '<i class="bi bi-shield-check text-danger me-2"></i>Tableau de bord Administrateur';
+                            } else {
+                                echo '<i class="bi bi-speedometer2 me-2"></i>Tableau de bord';
+                            }
+                            ?>
+                        </h1>
+                        <p class="text-muted mb-0">
+                            Bienvenue ! Voici vos informations.
+                        </p>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newItemModal">
-                            <i class="bi bi-plus-lg me-2"></i>
-                            New Item
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="Refresh data">
-                            <i class="bi bi-arrow-clockwise icon-hover"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="Export data">
-                            <i class="bi bi-download icon-hover"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="Settings">
-                            <i class="bi bi-gear icon-hover"></i>
-                        </button>
+                </div>
+
+                <!-- User Profile Information Card -->
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-6 col-lg-8">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    <?php 
+                                    if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
+                                        echo 'Profil Administrateur';
+                                    } else {
+                                        echo 'Profil Utilisateur';
+                                    }
+                                    ?>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                                    <!-- Admin Profile -->
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <i class="bi bi-shield-lock-fill text-danger fs-4 me-3"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Type de compte</small>
+                                            <strong class="text-danger">Administrateur</strong>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <i class="bi bi-person-badge-fill text-primary fs-4 me-3"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Nom d'utilisateur</small>
+                                            <strong><?= htmlspecialchars($_SESSION['admin_username'] ?? 'N/A') ?></strong>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info mt-3">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Vous êtes connecté en tant qu'administrateur avec des privilèges étendus.
+                                    </div>
+                                <?php else: ?>
+                                    <!-- User Profile -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-person-fill text-primary fs-4 me-3"></i>
+                                                <div>
+                                                    <small class="text-muted d-block">Nom</small>
+                                                    <strong><?= htmlspecialchars($_SESSION['user_nom'] ?? 'N/A') ?></strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-person-fill text-primary fs-4 me-3"></i>
+                                                <div>
+                                                    <small class="text-muted d-block">Prénom</small>
+                                                    <strong><?= htmlspecialchars($_SESSION['user_prenom'] ?? 'N/A') ?></strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-envelope-fill text-success fs-4 me-3"></i>
+                                                <div>
+                                                    <small class="text-muted d-block">Email</small>
+                                                    <strong><?= htmlspecialchars($_SESSION['user_email'] ?? 'N/A') ?></strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-telephone-fill text-warning fs-4 me-3"></i>
+                                                <div>
+                                                    <small class="text-muted d-block">Téléphone</small>
+                                                    <strong>
+                                                        <?php 
+                                                        // Récupérer le téléphone depuis la base de données
+                                                        if (isset($_SESSION['user_id'])) {
+                                                            try {
+                                                                $pdo = Flight::db();
+                                                                $stmt = $pdo->prepare("SELECT telephone FROM users WHERE id = ?");
+                                                                $stmt->execute([$_SESSION['user_id']]);
+                                                                $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                                echo htmlspecialchars($userData['telephone'] ?? 'Non renseigné');
+                                                            } catch (Exception $e) {
+                                                                echo 'Non disponible';
+                                                            }
+                                                        } else {
+                                                            echo 'Non disponible';
+                                                        }
+                                                        ?>
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-success mt-3">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Votre compte est actif et vérifié.
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil me-1"></i>Modifier le profil
+                                    </a>
+                                    <a href="/logout" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Card -->
+                    <div class="col-xl-6 col-lg-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-lightning-charge me-2"></i>Actions rapides
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                                        <a href="/metis/users" class="btn btn-outline-primary">
+                                            <i class="bi bi-people me-2"></i>Gérer les utilisateurs
+                                        </a>
+                                        <a href="/metis/settings" class="btn btn-outline-secondary">
+                                            <i class="bi bi-gear me-2"></i>Paramètres système
+                                        </a>
+                                        <a href="/metis/reports" class="btn btn-outline-info">
+                                            <i class="bi bi-bar-chart me-2"></i>Rapports
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="/metis/messages" class="btn btn-outline-primary">
+                                            <i class="bi bi-envelope me-2"></i>Mes messages
+                                        </a>
+                                        <a href="/metis/settings" class="btn btn-outline-secondary">
+                                            <i class="bi bi-gear me-2"></i>Paramètres
+                                        </a>
+                                        <a href="/metis/help" class="btn btn-outline-info">
+                                            <i class="bi bi-question-circle me-2"></i>Aide
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
