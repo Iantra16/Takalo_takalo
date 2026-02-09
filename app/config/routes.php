@@ -14,7 +14,6 @@ use flight\net\Router;
 $authController = new AuthController($app);
 $messageController = new MessageController($app);
 
-// Wrapper pour toutes les routes
 $router->group('', function(Router $router) use ($app, $authController, $messageController) {
 
 	// ===== AUTHENTICATION ROUTES =====

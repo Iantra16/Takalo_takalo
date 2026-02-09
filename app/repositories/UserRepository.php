@@ -14,12 +14,6 @@ class UserRepository {
     return (bool)$st->fetchColumn();
   }
 
-  public function findByEmail($email) {
-    $st = $this->pdo->prepare("SELECT id, nom, prenom, email, password_hash, telephone FROM users WHERE email=? LIMIT 1");
-    $st->execute([(string)$email]);
-    return $st->fetch(PDO::FETCH_ASSOC);
-  }
-
   public function findByEmailWithPassword($email) {
     $st = $this->pdo->prepare("SELECT id, nom, prenom, email, password_hash, telephone FROM users WHERE email=? LIMIT 1");
     $st->execute([(string)$email]);

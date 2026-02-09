@@ -178,7 +178,7 @@
     document.documentElement.setAttribute('data-bs-theme', savedTheme);
   });
 </script>
-<script src="/js/validation-complete-profile.js" defer></script>
+<script src="/js/LoginUser-ajax.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

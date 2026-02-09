@@ -64,7 +64,7 @@ return [
 	 **************************************/
 	'database' => [
 		'host'     => '127.0.0.1',      // Database host
-		'dbname'   => 'tp_validation',  // Database name
+		'dbname'   => 'takalo',  // Database name
 		'user'     => 'root',           // Database user
 		'password' => '',               // Database password
 		'charset'  => 'utf8mb4',        // Character set
