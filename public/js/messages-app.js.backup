@@ -1,0 +1,306 @@
+// Messages Component - Alpine.js
+window.messagesComponent = {
+    conversations: [],
+    filteredConversations: [],
+    selectedConversation: null,
+    currentMessages: [],
+    newMessage: '',
+    searchQuery: '',
+    sidebarVisible: window.innerWidth > 992,
+    showEmojiPicker: false,
+    isTyping: false,
+    loading: false,
+    emojis: ['😀', '😂', '🤣', '😍', '🥰', '😘', '😎', '🤔', '👍', '❤️', '🎉', '🚀', '✨', '🔥'],
+
+    // Initialisation
+    async init() {
+        console.log('Messages component initialized');
+        await this.loadConversations();
+        
+        // Rafraîchissement auto toutes les 5 secondes
+        setInterval(() => {
+            if (this.selectedConversation) {
+                this.loadMessages();
+            }
+        }, 5000);
+
+        // Écouter les changements de taille d'écran
+        window.addEventListener('resize', () => {
+            this.sidebarVisible = window.innerWidth > 992;
+        });
+
+        // Charger les utilisateurs quand le modal s'ouvre
+        const modalEl = document.getElementById('newConversationModal');
+        if (modalEl) {
+            modalEl.addEventListener('show.bs.modal', async () => {
+                const modalBody = modalEl.querySelector('.modal-body');
+                const alpineData = Alpine.$data(modalBody);
+                if (alpineData) {
+                    await alpineData.loadUsers();
+                }
+            });
+        }
+    },
+
+    // Charger les conversations
+    async loadConversations() {
+        try {
+            this.loading = true;
+            
+            // Utiliser les données initiales si disponibles, sinon faire l'appel API
+            if (typeof initialConversations !== 'undefined' && initialConversations.length > 0) {
+                this.conversations = initialConversations;
+                this.filteredConversations = [...this.conversations];
+                this.loading = false;
+            } else {
+                const response = await fetch('/api/messages/conversations');
+                
+                if (!response.ok) throw new Error('Failed to load conversations');
+                
+                this.conversations = await response.json();
+                this.filteredConversations = [...this.conversations];
+                this.loading = false;
+            }
+        } catch (error) {
+            console.error('Error loading conversations:', error);
+            alert('Error loading conversations: ' + error.message);
+            this.loading = false;
+        }
+    },
+
+    // Charger les messages d'une conversation
+    async loadMessages() {
+        if (!this.selectedConversation) return;
+
+        try {
+            const response = await fetch(`/api/messages/get?conversation_id=${this.selectedConversation.id}`);
+            
+            if (!response.ok) throw new Error('Failed to load messages');
+            
+            this.currentMessages = await response.json();
+            
+            // Auto-scroll vers le bas
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chatMessages');
+                if (chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }, 100);
+        } catch (error) {
+            console.error('Error loading messages:', error);
+            alert('Error loading messages: ' + error.message);
+        }
+    },
+
+    // Sélectionner une conversation
+    async selectConversation(conversation) {
+        this.selectedConversation = conversation;
+        this.sidebarVisible = false; // Fermer sidebar sur mobile
+        await this.loadMessages();
+    },
+
+    // Envoyer un message
+    async sendMessage() {
+        if (!this.selectedConversation || !this.newMessage.trim()) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/messages/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    conversation_id: this.selectedConversation.id,
+                    content: this.newMessage
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to send message');
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Ajouter le message à la liste
+                this.currentMessages.push(data.message);
+                this.newMessage = '';
+                this.isTyping = false;
+
+                // Mettre à jour la liste des conversations
+                await this.loadConversations();
+
+                // Auto-scroll
+                setTimeout(() => {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }, 100);
+            } else {
+                throw new Error(data.error || 'Failed to send message');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Error sending message: ' + error.message);
+        }
+    },
+
+    // Rafraîchir les messages
+    async refreshMessages() {
+        if (this.selectedConversation) {
+            await this.loadMessages();
+        }
+        await this.loadConversations();
+        console.log('Messages refreshed');
+    },
+
+    // Filtrer les conversations
+    filterConversations() {
+        if (!this.searchQuery.trim()) {
+            this.filteredConversations = [...this.conversations];
+        } else {
+            const query = this.searchQuery.toLowerCase();
+            this.filteredConversations = this.conversations.filter(conv => 
+                conv.name.toLowerCase().includes(query) || 
+                conv.email.toLowerCase().includes(query)
+            );
+        }
+    },
+
+    // Marquer tous les messages comme lus
+    async markAllRead() {
+        if (!this.selectedConversation) return;
+
+        try {
+            const response = await fetch('/api/messages/read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    conversation_id: this.selectedConversation.id
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to mark as read');
+
+            // Mettre à jour les messages
+            this.currentMessages.forEach(msg => {
+                if (!msg.sent) msg.read = true;
+            });
+
+            await this.loadConversations();
+        } catch (error) {
+            console.error('Error marking as read:', error);
+            alert('Error: ' + error.message);
+        }
+    },
+
+    // Nouvelle conversation
+    async newConversation() {
+        const modalEl = document.getElementById('newConversationModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    },
+
+    // Créer une nouvelle conversation depuis le modal
+    async createNewConversation(userId) {
+        if (!userId) {
+            alert('Please select a user');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/messages/create-conversation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    other_user_id: userId
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to create conversation');
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Recharger les conversations
+                await this.loadConversations();
+                
+                // Sélectionner la nouvelle conversation
+                const newConv = this.conversations.find(c => c.id === data.conversation_id);
+                if (newConv) {
+                    await this.selectConversation(newConv);
+                }
+            } else {
+                throw new Error(data.error || 'Failed to create conversation');
+            }
+        } catch (error) {
+            console.error('Error creating conversation:', error);
+            alert('Error: ' + error.message);
+        }
+    },
+
+    // Gérer la saisie
+    handleTyping() {
+        this.isTyping = this.newMessage.trim().length > 0;
+    },
+
+    // Auto-redimensionner la textarea
+    autoResize(event) {
+        const textarea = event.target;
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    },
+
+    // Basculer le sélecteur d'emoji
+    toggleEmojiPicker() {
+        this.showEmojiPicker = !this.showEmojiPicker;
+    },
+
+    // Ajouter un emoji
+    addEmoji(emoji) {
+        this.newMessage += emoji;
+        this.showEmojiPicker = false;
+    },
+
+    // Basculer la pièce jointe
+    toggleAttachment() {
+        alert('File upload coming soon!');
+    },
+
+    // Basculer sidebar
+    toggleSidebar() {
+        this.sidebarVisible = !this.sidebarVisible;
+    },
+
+    // Appel vidéo
+    videoCall() {
+        alert('Video call with ' + this.selectedConversation?.name + ' - Coming soon!');
+    },
+
+    // Appel vocal
+    voiceCall() {
+        alert('Voice call with ' + this.selectedConversation?.name + ' - Coming soon!');
+    },
+
+    // Couper les notifications
+    muteConversation() {
+        alert('Mute notifications - Coming soon!');
+    },
+
+    // Archiver la conversation
+    archiveConversation() {
+        alert('Archive conversation - Coming soon!');
+    },
+
+    // Supprimer la conversation
+    deleteConversation() {
+        if (confirm('Delete this conversation?')) {
+            alert('Delete conversation - Coming soon!');
+        }
+    }
+};
