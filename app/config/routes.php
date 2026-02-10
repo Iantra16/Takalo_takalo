@@ -39,28 +39,29 @@ $router->group('', function(Router $router) use ($app, $authController, $message
 			return;
 		}
 		
-		$app->render('metis/index', [
+		$app->redirect('takalo/dashboard');
+	});
+
+	// Metis admin template pages
+	$router->get('/takalo(/@page)', function($page = 'dashboard') use ($app) {
+		$page = $page ?? 'dashboard';
+		// $page = preg_replace('/\.(html|php)$/i', '', $page);
+		// $safePage = basename($page);
+		// $file = __DIR__ . '/../views/pages/' . $safePage . '.php';
+
+		// if (!is_file($file)) {
+		// 	$app->notFound();
+		// 	return;
+		// }
+
+		$app->render('models', [
+			'page' => $page ,
 			'user' => [
 				'nom' => $_SESSION['user_nom'] ?? '',
 				'prenom' => $_SESSION['user_prenom'] ?? '',
 				'email' => $_SESSION['user_email'] ?? ''
 			]
-		]);
-	});
-
-	// Metis admin template pages
-	$router->get('/metis(/@page)', function($page = 'index') use ($app) {
-		$page = $page ?? 'index';
-		$page = preg_replace('/\.(html|php)$/i', '', $page);
-		$safePage = basename($page);
-		$file = __DIR__ . '/../views/metis/' . $safePage . '.php';
-
-		if (!is_file($file)) {
-			$app->notFound();
-			return;
-		}
-
-		$app->render('metis/' . $safePage);
+		] );
 	});
 
 	// ===== MESSAGE ROUTES =====
