@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Takalo-takalo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .login-header {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .login-form {
+            padding: 3rem;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            color: white;
+        }
+
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            color: #64748b;
+        }
+
+        .social-btn {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            width: 100%;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .back-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px 15px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .back-home:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .form-floating {
+            position: relative;
+        }
+
+        .alert-demo {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .demo-credentials {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .login-card {
+                margin: 10px;
+            }
+            
+            .login-header,
+            .login-form {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Bouton retour -->
+    <a href="index.html" class="back-home">
+        <i class="fas fa-arrow-left me-2"></i>Retour à l'accueil
+    </a>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="row g-0">
+                <!-- En-tête -->
+                <div class="col-12">
+                    <div class="login-header">
+                        <h2 class="mb-3">
+                            <i class="fas fa-exchange-alt me-2"></i>Takalo-takalo
+                        </h2>
+                        <p class="mb-0 opacity-75">Connectez-vous pour commencer à échanger</p>
+                    </div>
+                </div>
+                
+                <!-- Formulaire -->
+                <div class="col-12">
+                    <div class="login-form">
+                        <!-- Informations de démo -->
+                        <div class="demo-credentials">
+                            <h6 class="text-warning mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Démonstration - Comptes de test
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <strong>Utilisateur :</strong><br>
+                                    Email: user@test.com<br>
+                                    Mot de passe: password123
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Administrateur :</strong><br>
+                                    Email: admin@test.com<br>
+                                    Mot de passe: admin123
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alerte de succès (masquée par défaut) -->
+                        <div class="alert alert-success alert-demo d-none" id="success-alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Connexion réussie ! Redirection en cours...
+                        </div>
+
+                        <!-- Alerte d'erreur (masquée par défaut) -->
+                        <div class="alert alert-danger alert-demo d-none" id="error-alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Email ou mot de passe incorrect.
+                        </div>
+
+                        <form id="login-form">
+                            <div class="mb-4">
+                                <label for="email" class="form-label">Adresse email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="Votre email" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Mot de passe</label>
+                                <div class="form-floating position-relative">
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           placeholder="Votre mot de passe" required style="padding-right: 50px;">
+                                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                                        <i class="fas fa-eye" id="password-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                        <label class="form-check-label" for="remember">
+                                            Se souvenir de moi
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <a href="forgot-password.html" class="text-decoration-none">
+                                        Mot de passe oublié ?
+                                    </a>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-login">
+                                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                            </button>
+                        </form>
+
+                        <div class="divider">
+                            <span>ou</span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <a href="#" class="social-btn" onclick="showSocialDemo('Google')">
+                                    <i class="fab fa-google text-danger"></i>
+                                    Continuer avec Google
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="#" class="social-btn" onclick="showSocialDemo('Facebook')">
+                                    <i class="fab fa-facebook text-primary"></i>
+                                    Continuer avec Facebook
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted">
+                                Pas encore de compte ? 
+                                <a href="register.html" class="text-decoration-none fw-bold">
+                                    Créer un compte
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('password-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Gestionnaire du formulaire de connexion
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simulation de vérification des identifiants
+            if ((email === 'user@test.com' && password === 'password123') || 
+                (email === 'admin@test.com' && password === 'admin123')) {
+                
+                // Masquer l'alerte d'erreur
+                document.getElementById('error-alert').classList.add('d-none');
+                
+                // Afficher l'alerte de succès
+                document.getElementById('success-alert').classList.remove('d-none');
+                
+                // Simulation de redirection
+                setTimeout(() => {
+                    if (email === 'admin@test.com') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 2000);
+                
+            } else {
+                // Masquer l'alerte de succès
+                document.getElementById('success-alert').classList.add('d-none');
+                
+                // Afficher l'alerte d'erreur
+                document.getElementById('error-alert').classList.remove('d-none');
+            }
+        });
+
+        // Démonstration des boutons sociaux
+        function showSocialDemo(platform) {
+            alert(`Démonstration : Connexion avec ${platform} non implémentée dans cette version statique.`);
+        }
+
+        // Auto-complétion pour la démonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajouter des suggestions au clic sur les comptes de test
+            const demoCredentials = document.querySelector('.demo-credentials');
+            if (demoCredentials) {
+                demoCredentials.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'DIV' && e.target.textContent.includes('user@test.com')) {
+                        document.getElementById('email').value = 'user@test.com';
+                        document.getElementById('password').value = 'password123';
+                    } else if (e.target.tagName === 'DIV' && e.target.textContent.includes('admin@test.com')) {
+                        document.getElementById('email').value = 'admin@test.com';
+                        document.getElementById('password').value = 'admin123';
+                    }
+                });
+            }
+        });
+
+        // Animation d'entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginCard = document.querySelector('.login-card');
+            loginCard.style.opacity = '0';
+            loginCard.style.transform = 'translateY(50px)';
+            
+            setTimeout(() => {
+                loginCard.style.transition = 'all 0.6s ease';
+                loginCard.style.opacity = '1';
+                loginCard.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

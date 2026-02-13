@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon compte - Takalo-takalo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            background: #f8fafc;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 76px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1rem;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-info {
+            text-align: center;
+        }
+
+        .profile-stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .dashboard-content {
+            padding: 2rem 0;
+            margin-top: -50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: none;
+        }
+
+        .nav-tabs-custom {
+            border: none;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs-custom .nav-link {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 10px;
+            margin-right: 0.5rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .object-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .object-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .object-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .category-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active { background: #dcfce7; color: #16a34a; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-completed { background: #dbeafe; color: #2563eb; }
+        .status-cancelled { background: #fee2e2; color: #dc2626; }
+
+        .price-tag {
+            background: var(--success-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-custom {
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-1px);
+        }
+
+        .exchange-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .exchange-item:hover {
+            background: #f8fafc;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .exchange-participants {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .participant-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .exchange-arrow {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .message-item {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .message-item:hover {
+            background: #f8fafc;
+        }
+
+        .message-item:last-child {
+            border-bottom: none;
+        }
+
+        .unread-message {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .floating-add-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-add-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 2rem 0;
+            }
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .dashboard-content {
+                margin-top: -30px;
+                padding: 1rem 0;
+            }
+
+            .floating-add-btn {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-exchange-alt me-2"></i>Takalo-takalo
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="objects.html">Objets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html">Mon compte</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>Marie Dupont
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mon profil</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login-selector.html"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <section class="profile-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-4">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2 class="fw-bold">Marie Dupont</h2>
+                        <p class="opacity-75 mb-0">marie.dupont@email.com</p>
+                        <small class="opacity-50">Membre depuis janvier 2024</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-8">
+                    <div class="profile-stats">
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="stat-item">
+                                    <div class="stat-number">24</div>
+                                    <small class="opacity-75">Objets publiés</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="stat-item">
+                                    <div class="stat-number">18</div>
+                                    <small class="opacity-75">Échanges réussis</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="stat-item">
+                                    <div class="stat-number">4.8</div>
+                                    <small class="opacity-75">Note moyenne</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="stat-item">
+                                    <div class="stat-number">€1,250</div>
+                                    <small class="opacity-75">Valeur échangée</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-content">
+        <div class="container">
+            <div class="dashboard-card">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs nav-tabs-custom" id="dashboardTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="objects-tab" data-bs-toggle="tab" data-bs-target="#objects" type="button" role="tab">
+                            <i class="fas fa-box me-2"></i>Mes objets (24)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="exchanges-tab" data-bs-toggle="tab" data-bs-target="#exchanges" type="button" role="tab">
+                            <i class="fas fa-handshake me-2"></i>Échanges (12)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab">
+                            <i class="fas fa-envelope me-2"></i>Messages (5)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">
+                            <i class="fas fa-heart me-2"></i>Favoris (8)
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="dashboardTabsContent">
+                    <!-- Mes objets -->
+                    <div class="tab-pane fade show active" id="objects" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">Mes objets publiés</h5>
+                            <button class="btn btn-primary btn-custom" onclick="showAddObjectModal()">
+                                <i class="fas fa-plus me-2"></i>Ajouter un objet
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card object-card">
+                                    <img src="https://via.placeholder.com/400x200/667eea/ffffff?text=iPhone+12" 
+                                         class="object-image" alt="iPhone 12">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title fw-bold">iPhone 12 Pro - 128GB</h6>
+                                            <span class="category-badge">Électronique</span>
+                                        </div>
+                                        <p class="card-text text-muted small">Très bon état, avec accessoires d'origine</p>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="price-tag">450€</span>
+                                            <span class="status-badge status-active">Actif</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-outline-primary btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card object-card">
+                                    <img src="https://via.placeholder.com/400x200/10b981/ffffff?text=MacBook+Pro" 
+                                         class="object-image" alt="MacBook Pro">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title fw-bold">MacBook Pro 2021</h6>
+                                            <span class="category-badge">Électronique</span>
+                                        </div>
+                                        <p class="card-text text-muted small">M1 Pro, 16GB RAM, 512GB SSD</p>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="price-tag">1200€</span>
+                                            <span class="status-badge status-pending">En échange</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-outline-primary btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card object-card">
+                                    <img src="https://via.placeholder.com/400x200/f59e0b/ffffff?text=Nike+Shoes" 
+                                         class="object-image" alt="Chaussures Nike">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title fw-bold">Chaussures Nike Air Max</h6>
+                                            <span class="category-badge">Vêtements</span>
+                                        </div>
+                                        <p class="card-text text-muted small">Taille 42, portées quelques fois</p>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="price-tag">85€</span>
+                                            <span class="status-badge status-completed">Échangé</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-outline-primary btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-custom btn-sm flex-fill">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-primary">Voir tous mes objets</button>
+                        </div>
+                    </div>
+
+                    <!-- Échanges -->
+                    <div class="tab-pane fade" id="exchanges" role="tabpanel">
+                        <h5 class="mb-4">Mes échanges</h5>
+
+                        <div class="exchange-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="exchange-participants">
+                                        <div>
+                                            <div class="participant-avatar">M</div>
+                                            <small class="text-muted d-block text-center">Vous</small>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">iPhone 12 Pro</div>
+                                            <div class="fw-bold">450€</div>
+                                        </div>
+                                        <div class="exchange-arrow">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">MacBook Air</div>
+                                            <div class="fw-bold">480€</div>
+                                        </div>
+                                        <div>
+                                            <div class="participant-avatar">J</div>
+                                            <small class="text-muted d-block text-center">Jean</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="status-badge status-pending">En négociation</span>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Il y a 2 heures</small>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button class="btn btn-outline-success btn-sm me-2">Accepter</button>
+                                        <button class="btn btn-outline-danger btn-sm">Refuser</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="exchange-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="exchange-participants">
+                                        <div>
+                                            <div class="participant-avatar">M</div>
+                                            <small class="text-muted d-block text-center">Vous</small>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Chaussures Nike</div>
+                                            <div class="fw-bold">85€</div>
+                                        </div>
+                                        <div class="exchange-arrow">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Livre collection</div>
+                                            <div class="fw-bold">80€</div>
+                                        </div>
+                                        <div>
+                                            <div class="participant-avatar">S</div>
+                                            <small class="text-muted d-block text-center">Sophie</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="status-badge status-completed">Terminé</span>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Il y a 3 jours</small>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button class="btn btn-outline-primary btn-sm">Voir détails</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="tab-pane fade" id="messages" role="tabpanel">
+                        <h5 class="mb-4">Messages récents</h5>
+
+                        <div class="message-item unread-message">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex">
+                                    <div class="participant-avatar me-3">J</div>
+                                    <div>
+                                        <h6 class="mb-1">Jean Martin</h6>
+                                        <p class="mb-1">Bonjour, je suis intéressé par votre iPhone. Pouvons-nous discuter de l'échange ?</p>
+                                        <small class="text-muted">Il y a 30 minutes</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="badge bg-primary rounded-pill">Nouveau</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-item">
+                            <div class="d-flex">
+                                <div class="participant-avatar me-3">S</div>
+                                <div>
+                                    <h6 class="mb-1">Sophie Laurent</h6>
+                                    <p class="mb-1">Merci pour l'échange ! Tout s'est parfaitement déroulé.</p>
+                                    <small class="text-muted">Il y a 2 heures</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-item">
+                            <div class="d-flex">
+                                <div class="participant-avatar me-3">P</div>
+                                <div>
+                                    <h6 class="mb-1">Paul Dubois</h6>
+                                    <p class="mb-1">Pouvez-vous m'envoyer plus de photos du MacBook ?</p>
+                                    <small class="text-muted">Hier</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Favoris -->
+                    <div class="tab-pane fade" id="favorites" role="tabpanel">
+                        <h5 class="mb-4">Mes objets favoris</h5>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card object-card">
+                                    <div class="row g-0">
+                                        <div class="col-4">
+                                            <img src="https://via.placeholder.com/150x150/6366f1/ffffff?text=Guitar" 
+                                                 class="object-image" alt="Guitare">
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Guitare acoustique</h6>
+                                                <p class="card-text small text-muted">Par Anna Schmidt</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="price-tag small">120€</span>
+                                                    <button class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-handshake me-1"></i>Proposer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="card object-card">
+                                    <div class="row g-0">
+                                        <div class="col-4">
+                                            <img src="https://via.placeholder.com/150x150/84cc16/ffffff?text=Camera" 
+                                                 class="object-image" alt="Appareil photo">
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Canon EOS 600D</h6>
+                                                <p class="card-text small text-muted">Par Michel Durand</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="price-tag small">300€</span>
+                                                    <button class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-handshake me-1"></i>Proposer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-primary">Voir tous mes favoris</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Add Button -->
+    <button class="floating-add-btn" onclick="showAddObjectModal()" title="Ajouter un objet">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animation d'entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation des cartes d'objets
+            const objectCards = document.querySelectorAll('.object-card');
+            objectCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animation des statistiques
+            animateStats();
+        });
+
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = stat.textContent;
+                if (finalValue.includes('€')) {
+                    let current = 0;
+                    const target = parseInt(finalValue.replace(/[€,]/g, ''));
+                    const increment = target / 30;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = `€${Math.floor(current).toLocaleString()}`;
+                    }, 50);
+                } else if (finalValue.includes('.')) {
+                    let current = 0;
+                    const target = parseFloat(finalValue);
+                    const increment = target / 30;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = current.toFixed(1);
+                    }, 50);
+                } else {
+                    let current = 0;
+                    const target = parseInt(finalValue);
+                    const increment = target / 30;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = Math.floor(current);
+                    }, 50);
+                }
+            });
+        }
+
+        // Gestion des onglets avec animation
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tabTrigger => {
+            tabTrigger.addEventListener('shown.bs.tab', function (event) {
+                const targetPane = document.querySelector(event.target.getAttribute('data-bs-target'));
+                const cards = targetPane.querySelectorAll('.object-card, .exchange-item, .message-item');
+                
+                cards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.3s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 80);
+                });
+            });
+        });
+
+        // Modal d'ajout d'objet (simulation)
+        function showAddObjectModal() {
+            alert('Fonctionnalité d\'ajout d\'objet - Non implémentée dans cette version statique.\n\nDans la version complète, ceci ouvrirait un modal avec un formulaire pour ajouter un nouvel objet à échanger.');
+        }
+
+        // Gestion des actions sur les objets
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-outline-primary')) {
+                const card = e.target.closest('.object-card');
+                if (card) {
+                    const title = card.querySelector('.card-title').textContent;
+                    alert(`Édition de l'objet: ${title}\n\nCette fonctionnalité ouvrirait un formulaire d'édition.`);
+                }
+            }
+            
+            if (e.target.closest('.btn-outline-success')) {
+                const card = e.target.closest('.object-card');
+                if (card) {
+                    const title = card.querySelector('.card-title').textContent;
+                    alert(`Affichage des détails: ${title}\n\nCeci redirigerait vers la page de détail de l'objet.`);
+                }
+            }
+            
+            if (e.target.closest('.btn-outline-danger')) {
+                const card = e.target.closest('.object-card');
+                if (card) {
+                    const title = card.querySelector('.card-title').textContent;
+                    if (confirm(`Êtes-vous sûr de vouloir supprimer "${title}" ?`)) {
+                        card.style.transition = 'all 0.3s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateX(-100%)';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                        }, 300);
+                    }
+                }
+            }
+        });
+
+        // Marquer les messages comme lus
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.message-item.unread-message')) {
+                const messageItem = e.target.closest('.message-item');
+                messageItem.classList.remove('unread-message');
+                
+                const badge = messageItem.querySelector('.badge');
+                if (badge) {
+                    badge.style.transition = 'all 0.3s ease';
+                    badge.style.opacity = '0';
+                    setTimeout(() => {
+                        badge.remove();
+                    }, 300);
+                }
+            }
+        });
+
+        // Effet de survol sur les éléments d'échange
+        document.querySelectorAll('.exchange-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Animation du bouton flottant
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            const floatingBtn = document.querySelector('.floating-add-btn');
+            floatingBtn.style.transform = 'scale(0.8)';
+            
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                floatingBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
+    </script>
+</body>
+</html>

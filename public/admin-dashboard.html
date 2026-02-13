@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Admin - Takalo-takalo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            background: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .sidebar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-nav .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .sidebar-nav .nav-link i {
+            width: 20px;
+            margin-right: 0.5rem;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        /* Cards */
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .table th {
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: #64748b;
+            padding: 1rem 0.75rem;
+        }
+
+        .table td {
+            border: none;
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .badge-custom {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn-action {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+
+        .quick-actions {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block !important;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Notifications */
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8fafc;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="sidebar-brand">
+                <i class="fas fa-exchange-alt me-2"></i>Takalo Admin
+            </h4>
+            <small class="text-light opacity-75">Panneau d'administration</small>
+        </div>
+        
+        <ul class="nav flex-column sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i>Tableau de bord
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#users">
+                    <i class="fas fa-users"></i>Utilisateurs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#objects">
+                    <i class="fas fa-box"></i>Objets
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#exchanges">
+                    <i class="fas fa-handshake"></i>Échanges
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#categories">
+                    <i class="fas fa-tags"></i>Catégories
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#reports">
+                    <i class="fas fa-chart-line"></i>Rapports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#messages">
+                    <i class="fas fa-envelope"></i>Messages
+                    <span class="badge bg-danger ms-auto">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#settings">
+                    <i class="fas fa-cog"></i>Paramètres
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link text-warning" href="index.html">
+                    <i class="fas fa-external-link-alt"></i>Voir le site
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="login-selector.html">
+                    <i class="fas fa-sign-out-alt"></i>Déconnexion
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary mobile-menu-btn me-3" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h4 class="mb-0">Tableau de bord</h4>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                5
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;">
+                            <li><h6 class="dropdown-header">Notifications récentes</h6></li>
+                            <li class="notification-item">
+                                <div class="d-flex">
+                                    <div class="notification-dot mt-1"></div>
+                                    <div>
+                                        <small class="fw-bold">Nouvel utilisateur</small>
+                                        <br><small class="text-muted">Marie Dupont s'est inscrite</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="notification-item">
+                                <div class="d-flex">
+                                    <div class="notification-dot mt-1"></div>
+                                    <div>
+                                        <small class="fw-bold">Échange terminé</small>
+                                        <br><small class="text-muted">iPhone 12 échangé avec succès</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center" href="#">Voir toutes les notifications</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                            <div class="avatar me-2">A</div>
+                            <span>Admin</span>
+                            <i class="fas fa-chevron-down ms-2"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mon profil</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login-selector.html"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary text-white">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number text-primary">2,543</div>
+                        <h6 class="text-muted">Utilisateurs actifs</h6>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> +12% ce mois
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success text-white">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-number text-success">15,247</div>
+                        <h6 class="text-muted">Objets publiés</h6>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> +8% ce mois
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning text-white">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stat-number text-warning">8,192</div>
+                        <h6 class="text-muted">Échanges réussis</h6>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> +15% ce mois
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-info text-white">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <div class="stat-number text-info">€2.1M</div>
+                        <h6 class="text-muted">Valeur échangée</h6>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> +22% ce mois
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-card">
+                        <h5 class="mb-3">Évolution des échanges</h5>
+                        <div class="chart-container">
+                            <canvas id="exchangesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="quick-actions">
+                        <h5 class="mb-3">Actions rapides</h5>
+                        
+                        <a href="#" class="action-btn">
+                            <i class="fas fa-user-plus d-block"></i>
+                            <span>Ajouter utilisateur</span>
+                        </a>
+                        
+                        <a href="#" class="action-btn">
+                            <i class="fas fa-tags d-block"></i>
+                            <span>Gérer catégories</span>
+                        </a>
+                        
+                        <a href="#" class="action-btn">
+                            <i class="fas fa-chart-bar d-block"></i>
+                            <span>Voir rapports</span>
+                        </a>
+                        
+                        <a href="#" class="action-btn">
+                            <i class="fas fa-cog d-block"></i>
+                            <span>Paramètres</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities Table -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="table-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Activités récentes</h5>
+                            <a href="#" class="btn btn-outline-primary btn-sm">Voir tout</a>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Utilisateur</th>
+                                        <th>Action</th>
+                                        <th>Objet</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2">M</div>
+                                                <div>
+                                                    <div class="fw-bold">Marie Dupont</div>
+                                                    <small class="text-muted">marie@email.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Ajout d'objet</td>
+                                        <td>iPhone 12 Pro</td>
+                                        <td>Il y a 2h</td>
+                                        <td><span class="badge badge-success">Actif</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-action">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-action">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2">J</div>
+                                                <div>
+                                                    <div class="fw-bold">Jean Martin</div>
+                                                    <small class="text-muted">jean@email.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Échange proposé</td>
+                                        <td>MacBook Pro 2021</td>
+                                        <td>Il y a 3h</td>
+                                        <td><span class="badge badge-warning">En attente</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-action">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-action">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2">S</div>
+                                                <div>
+                                                    <div class="fw-bold">Sophie Laurent</div>
+                                                    <small class="text-muted">sophie@email.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Échange terminé</td>
+                                        <td>Livre "Le Petit Prince"</td>
+                                        <td>Il y a 5h</td>
+                                        <td><span class="badge badge-success">Terminé</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-action">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-action">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2">P</div>
+                                                <div>
+                                                    <div class="fw-bold">Paul Dubois</div>
+                                                    <small class="text-muted">paul@email.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Signalement</td>
+                                        <td>Chaussures Nike</td>
+                                        <td>Il y a 1j</td>
+                                        <td><span class="badge badge-danger">Signalé</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-danger btn-action">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-action">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="chart-card">
+                        <h5 class="mb-3">Répartition par catégorie</h5>
+                        <div class="chart-container">
+                            <canvas id="categoriesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Toggle sidebar pour mobile
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Graphique des échanges
+        const exchangesCtx = document.getElementById('exchangesChart').getContext('2d');
+        new Chart(exchangesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                datasets: [{
+                    label: 'Échanges réussis',
+                    data: [450, 520, 480, 600, 720, 850, 780, 920, 1050, 980, 1150, 1200],
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Graphique des catégories
+        const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+        new Chart(categoriesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Vêtements', 'Électronique', 'Livres', 'Sports', 'Maison'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        '#4f46e5',
+                        '#06b6d4',
+                        '#f59e0b',
+                        '#10b981',
+                        '#ef4444'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Navigation active
+        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Retirer la classe active de tous les liens
+                document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => {
+                    l.classList.remove('active');
+                });
+                
+                // Ajouter la classe active au lien cliqué
+                this.classList.add('active');
+                
+                // Fermer la sidebar sur mobile
+                if (window.innerWidth < 768) {
+                    document.getElementById('sidebar').classList.remove('show');
+                }
+            });
+        });
+
+        // Animation des cartes statistiques
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+
+            // Animation des chiffres
+            animateNumbers();
+        });
+
+        function animateNumbers() {
+            const numbers = document.querySelectorAll('.stat-number');
+            numbers.forEach(number => {
+                const target = parseInt(number.textContent.replace(/[^0-9]/g, ''));
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    
+                    let displayValue = Math.floor(current);
+                    if (number.textContent.includes('€')) {
+                        displayValue = displayValue >= 1000000 
+                            ? `€${(displayValue / 1000000).toFixed(1)}M`
+                            : `€${displayValue.toLocaleString()}`;
+                    } else {
+                        displayValue = displayValue.toLocaleString();
+                    }
+                    
+                    number.textContent = displayValue;
+                }, 50);
+            });
+        }
+
+        // Simulation de notifications en temps réel
+        setInterval(() => {
+            const badge = document.querySelector('.badge.bg-danger');
+            if (badge) {
+                let count = parseInt(badge.textContent);
+                if (Math.random() > 0.7) { // 30% de chance d'avoir une nouvelle notification
+                    count++;
+                    badge.textContent = count;
+                    
+                    // Effet d'animation sur la cloche
+                    const bellIcon = document.querySelector('.fa-bell');
+                    bellIcon.classList.add('fa-shake');
+                    setTimeout(() => {
+                        bellIcon.classList.remove('fa-shake');
+                    }, 1000);
+                }
+            }
+        }, 30000); // Vérifier toutes les 30 secondes
+
+        // Fermer la sidebar en cliquant à l'extérieur sur mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const sidebarButton = document.querySelector('.mobile-menu-btn');
+                
+                if (!sidebar.contains(e.target) && !sidebarButton.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

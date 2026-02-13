@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcourir les objets - Takalo-takalo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .hero-search {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .search-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-input {
+            border: none;
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-search {
+            background: var(--accent-color);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-search:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        .filter-sidebar {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-section {
+            margin-bottom: 2rem;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #374151;
+        }
+
+        .object-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .object-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .object-image {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .category-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .price-tag {
+            background: var(--success-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .pagination-custom .page-link {
+            border: none;
+            border-radius: 10px;
+            margin: 0 2px;
+            color: var(--primary-color);
+        }
+
+        .pagination-custom .page-item.active .page-link {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .sort-dropdown {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 15px;
+        }
+
+        .view-toggle {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: #6b7280;
+            text-decoration: none;
+            margin: 0 2px;
+        }
+
+        .view-toggle.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .list-view .object-card {
+            margin-bottom: 1rem;
+        }
+
+        .list-view .card-body {
+            padding: 1.5rem;
+        }
+
+        .list-view .object-image {
+            height: 150px;
+        }
+
+        .filter-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        .clear-filters {
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .filter-sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            .hero-search {
+                padding: 2rem 0;
+            }
+
+            .search-form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-exchange-alt me-2"></i>Takalo-takalo
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="objects.html">Objets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Mon compte</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="login-selector.html">
+                            <i class="fas fa-sign-in-alt me-1"></i>Connexion
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.html">
+                            <i class="fas fa-user-plus me-1"></i>Inscription
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section de recherche -->
+    <section class="hero-search" style="margin-top: 76px;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="search-form">
+                        <h3 class="text-center mb-4">Trouvez l'objet parfait</h3>
+                        <form id="search-form">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control search-input" id="search-query" 
+                                           placeholder="Rechercher un objet, une marque, une catégorie...">
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-search w-100">
+                                        <i class="fas fa-search me-2"></i>Rechercher
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenu principal -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar des filtres -->
+                <div class="col-lg-3">
+                    <div class="filter-sidebar">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Filtres</h5>
+                            <a href="#" class="clear-filters" onclick="clearAllFilters()">
+                                <i class="fas fa-times me-1"></i>Effacer
+                            </a>
+                        </div>
+
+                        <!-- Filtres actifs -->
+                        <div id="active-filters" class="mb-3"></div>
+
+                        <!-- Catégories -->
+                        <div class="filter-section">
+                            <h6 class="filter-title">Catégories</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="cat-all" value="all" checked>
+                                <label class="form-check-label" for="cat-all">Toutes les catégories</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input category-filter" type="checkbox" id="cat-vetements" value="vetements">
+                                <label class="form-check-label" for="cat-vetements">
+                                    <i class="fas fa-tshirt me-2"></i>Vêtements (125)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input category-filter" type="checkbox" id="cat-livres" value="livres">
+                                <label class="form-check-label" for="cat-livres">
+                                    <i class="fas fa-book me-2"></i>Livres (89)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input category-filter" type="checkbox" id="cat-electronique" value="electronique">
+                                <label class="form-check-label" for="cat-electronique">
+                                    <i class="fas fa-laptop me-2"></i>Électronique (67)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input category-filter" type="checkbox" id="cat-sports" value="sports">
+                                <label class="form-check-label" for="cat-sports">
+                                    <i class="fas fa-football-ball me-2"></i>Sports (45)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input category-filter" type="checkbox" id="cat-maison" value="maison">
+                                <label class="form-check-label" for="cat-maison">
+                                    <i class="fas fa-home me-2"></i>Maison (78)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Prix estimé -->
+                        <div class="filter-section">
+                            <h6 class="filter-title">Prix estimé</h6>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" id="price-0-25" value="0-25">
+                                <label class="form-check-label" for="price-0-25">Moins de 25€</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" id="price-25-50" value="25-50">
+                                <label class="form-check-label" for="price-25-50">25€ - 50€</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" id="price-50-100" value="50-100">
+                                <label class="form-check-label" for="price-50-100">50€ - 100€</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" id="price-100-plus" value="100+">
+                                <label class="form-check-label" for="price-100-plus">Plus de 100€</label>
+                            </div>
+                        </div>
+
+                        <!-- État -->
+                        <div class="filter-section">
+                            <h6 class="filter-title">État</h6>
+                            <div class="form-check">
+                                <input class="form-check-input condition-filter" type="checkbox" id="condition-neuf" value="neuf">
+                                <label class="form-check-label" for="condition-neuf">Neuf</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input condition-filter" type="checkbox" id="condition-bon" value="bon">
+                                <label class="form-check-label" for="condition-bon">Bon état</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input condition-filter" type="checkbox" id="condition-correct" value="correct">
+                                <label class="form-check-label" for="condition-correct">État correct</label>
+                            </div>
+                        </div>
+
+                        <!-- Ville -->
+                        <div class="filter-section">
+                            <h6 class="filter-title">Localisation</h6>
+                            <select class="form-select" id="city-filter">
+                                <option value="">Toutes les villes</option>
+                                <option value="Antananarivo">Antananarivo</option>
+                                <option value="Antsirabe">Antsirabe</option>
+                                <option value="Fianarantsoa">Fianarantsoa</option>
+                                <option value="Mahajanga">Mahajanga</option>
+                                <option value="Toamasina">Toamasina</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des objets -->
+                <div class="col-lg-9">
+                    <!-- Barre d'outils -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="mb-1">Objets disponibles</h4>
+                            <p class="text-muted mb-0" id="results-count">1,247 objets trouvés</p>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Tri -->
+                            <select class="form-select sort-dropdown" id="sort-select" style="width: auto;">
+                                <option value="recent">Plus récents</option>
+                                <option value="price-asc">Prix croissant</option>
+                                <option value="price-desc">Prix décroissant</option>
+                                <option value="popular">Plus populaires</option>
+                            </select>
+
+                            <!-- Vue -->
+                            <div class="btn-group" role="group">
+                                <a href="#" class="view-toggle active" data-view="grid" onclick="changeView('grid')">
+                                    <i class="fas fa-th"></i>
+                                </a>
+                                <a href="#" class="view-toggle" data-view="list" onclick="changeView('list')">
+                                    <i class="fas fa-list"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spinner de chargement -->
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Recherche en cours...</p>
+                    </div>
+
+                    <!-- Grille des objets -->
+                    <div class="row" id="objects-grid">
+                        <!-- Les objets seront générés par JavaScript -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Pagination des objets" class="mt-5">
+                        <ul class="pagination pagination-custom justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Précédent">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#" aria-label="Suivant">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Données de démonstration
+        const demoObjects = [
+            { id: 1, title: "T-shirt Nike Rouge", category: "vetements", price: 25, condition: "bon", city: "Antananarivo", image: "https://via.placeholder.com/400x250/667eea/ffffff?text=T-shirt+Nike", user: "Marie", date: "2024-01-15" },
+            { id: 2, title: "Le Petit Prince", category: "livres", price: 8, condition: "neuf", city: "Antsirabe", image: "https://via.placeholder.com/400x250/10b981/ffffff?text=Le+Petit+Prince", user: "Jean", date: "2024-01-14" },
+            { id: 3, title: "iPhone 12 - 128GB", category: "electronique", price: 450, condition: "bon", city: "Antananarivo", image: "https://via.placeholder.com/400x250/6366f1/ffffff?text=iPhone+12", user: "Sarah", date: "2024-01-13" },
+            { id: 4, title: "Raquette de tennis Wilson", category: "sports", price: 80, condition: "correct", city: "Fianarantsoa", image: "https://via.placeholder.com/400x250/ef4444/ffffff?text=Raquette+Tennis", user: "Paul", date: "2024-01-12" },
+            { id: 5, title: "Vase en céramique", category: "maison", price: 30, condition: "neuf", city: "Mahajanga", image: "https://via.placeholder.com/400x250/8b5cf6/ffffff?text=Vase+Ceramique", user: "Claire", date: "2024-01-11" },
+            { id: 6, title: "Avatar - Blu-ray", category: "livres", price: 15, condition: "bon", city: "Toamasina", image: "https://via.placeholder.com/400x250/f59e0b/ffffff?text=Avatar+Blu-ray", user: "Marc", date: "2024-01-10" },
+            { id: 7, title: "Jeans Levi's", category: "vetements", price: 40, condition: "bon", city: "Antananarivo", image: "https://via.placeholder.com/400x250/3b82f6/ffffff?text=Jeans+Levis", user: "Lisa", date: "2024-01-09" },
+            { id: 8, title: "MacBook Pro 2019", category: "electronique", price: 800, condition: "bon", city: "Antananarivo", image: "https://via.placeholder.com/400x250/1f2937/ffffff?text=MacBook+Pro", user: "David", date: "2024-01-08" },
+            { id: 9, title: "Guitare acoustique", category: "maison", price: 120, condition: "correct", city: "Antsirabe", image: "https://via.placeholder.com/400x250/f97316/ffffff?text=Guitare", user: "Anna", date: "2024-01-07" },
+            { id: 10, title: "Chaussures de course Nike", category: "sports", price: 60, condition: "bon", city: "Fianarantsoa", image: "https://via.placeholder.com/400x250/06b6d4/ffffff?text=Nike+Shoes", user: "Tom", date: "2024-01-06" },
+            { id: 11, title: "Livre de cuisine", category: "livres", price: 12, condition: "neuf", city: "Mahajanga", image: "https://via.placeholder.com/400x250/84cc16/ffffff?text=Livre+Cuisine", user: "Sophie", date: "2024-01-05" },
+            { id: 12, title: "Lampe de bureau", category: "maison", price: 35, condition: "bon", city: "Toamasina", image: "https://via.placeholder.com/400x250/a855f7/ffffff?text=Lampe+Bureau", user: "Michel", date: "2024-01-04" }
+        ];
+
+        let currentView = 'grid';
+        let filteredObjects = [...demoObjects];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            displayObjects();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Filtres par catégorie
+            document.querySelectorAll('.category-filter').forEach(filter => {
+                filter.addEventListener('change', applyFilters);
+            });
+
+            // Filtre "Toutes catégories"
+            document.getElementById('cat-all').addEventListener('change', function() {
+                if (this.checked) {
+                    document.querySelectorAll('.category-filter').forEach(f => f.checked = false);
+                }
+                applyFilters();
+            });
+
+            // Autres filtres
+            document.querySelectorAll('.price-filter, .condition-filter').forEach(filter => {
+                filter.addEventListener('change', applyFilters);
+            });
+
+            document.getElementById('city-filter').addEventListener('change', applyFilters);
+            document.getElementById('sort-select').addEventListener('change', sortObjects);
+            document.getElementById('search-form').addEventListener('submit', handleSearch);
+        }
+
+        function displayObjects() {
+            const grid = document.getElementById('objects-grid');
+            const isListView = currentView === 'list';
+            
+            if (filteredObjects.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-search text-muted mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
+                        <h4 class="text-muted">Aucun objet trouvé</h4>
+                        <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.className = isListView ? 'row list-view' : 'row';
+            
+            grid.innerHTML = filteredObjects.map(obj => {
+                const categoryNames = {
+                    vetements: 'Vêtements',
+                    livres: 'Livres',
+                    electronique: 'Électronique',
+                    sports: 'Sports',
+                    maison: 'Maison'
+                };
+
+                const conditionNames = {
+                    neuf: 'Neuf',
+                    bon: 'Bon état',
+                    correct: 'État correct'
+                };
+
+                const colClass = isListView ? 'col-12' : 'col-lg-4 col-md-6';
+                const cardLayout = isListView ? 
+                    `<div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="${obj.image}" class="object-image" alt="${obj.title}">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold">${obj.title}</h5>
+                                    <span class="category-badge">${categoryNames[obj.category]}</span>
+                                </div>
+                                <p class="card-text text-muted">État: ${conditionNames[obj.condition]} • ${obj.city}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="price-tag">${obj.price}€ estimé</span>
+                                    <div class="user-info">
+                                        <div class="user-avatar">${obj.user.charAt(0)}</div>
+                                        <small class="text-muted">Par ${obj.user}</small>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="object-detail.html" class="btn btn-primary btn-sm me-2">
+                                        <i class="fas fa-eye me-1"></i>Voir détail
+                                    </a>
+                                    <a href="#" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-handshake me-1"></i>Proposer échange
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>` :
+                    `<img src="${obj.image}" class="card-img-top object-image" alt="${obj.title}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold">${obj.title}</h5>
+                            <span class="category-badge">${categoryNames[obj.category]}</span>
+                        </div>
+                        <p class="card-text text-muted">État: ${conditionNames[obj.condition]}</p>
+                        <p class="card-text text-muted"><i class="fas fa-map-marker-alt me-1"></i>${obj.city}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="price-tag">${obj.price}€ estimé</span>
+                            <div class="user-info">
+                                <div class="user-avatar">${obj.user.charAt(0)}</div>
+                                <small class="text-muted">Par ${obj.user}</small>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="object-detail.html" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>Voir détail
+                            </a>
+                        </div>
+                    </div>`;
+
+                return `
+                    <div class="${colClass}">
+                        <div class="card object-card">
+                            ${cardLayout}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateResultsCount();
+        }
+
+        function applyFilters() {
+            const categories = [];
+            const prices = [];
+            const conditions = [];
+            
+            // Catégories
+            const allCategoriesChecked = document.getElementById('cat-all').checked;
+            if (!allCategoriesChecked) {
+                document.querySelectorAll('.category-filter:checked').forEach(f => {
+                    categories.push(f.value);
+                });
+            }
+
+            // Prix
+            document.querySelectorAll('.price-filter:checked').forEach(f => {
+                prices.push(f.value);
+            });
+
+            // Conditions
+            document.querySelectorAll('.condition-filter:checked').forEach(f => {
+                conditions.push(f.value);
+            });
+
+            // Ville
+            const selectedCity = document.getElementById('city-filter').value;
+
+            // Appliquer les filtres
+            filteredObjects = demoObjects.filter(obj => {
+                // Filtre catégorie
+                if (!allCategoriesChecked && categories.length > 0 && !categories.includes(obj.category)) {
+                    return false;
+                }
+
+                // Filtre prix
+                if (prices.length > 0) {
+                    const inPriceRange = prices.some(range => {
+                        if (range === '0-25') return obj.price < 25;
+                        if (range === '25-50') return obj.price >= 25 && obj.price <= 50;
+                        if (range === '50-100') return obj.price >= 50 && obj.price <= 100;
+                        if (range === '100+') return obj.price > 100;
+                        return false;
+                    });
+                    if (!inPriceRange) return false;
+                }
+
+                // Filtre condition
+                if (conditions.length > 0 && !conditions.includes(obj.condition)) {
+                    return false;
+                }
+
+                // Filtre ville
+                if (selectedCity && obj.city !== selectedCity) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            showLoading();
+            setTimeout(() => {
+                displayObjects();
+                updateActiveFilters();
+            }, 500);
+        }
+
+        function sortObjects() {
+            const sortBy = document.getElementById('sort-select').value;
+            
+            filteredObjects.sort((a, b) => {
+                switch (sortBy) {
+                    case 'price-asc':
+                        return a.price - b.price;
+                    case 'price-desc':
+                        return b.price - a.price;
+                    case 'popular':
+                        return Math.random() - 0.5; // Simulation
+                    case 'recent':
+                    default:
+                        return new Date(b.date) - new Date(a.date);
+                }
+            });
+
+            displayObjects();
+        }
+
+        function changeView(view) {
+            currentView = view;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.view-toggle').forEach(toggle => {
+                toggle.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+            displayObjects();
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-query').value.toLowerCase();
+            
+            if (query.trim() === '') {
+                filteredObjects = [...demoObjects];
+            } else {
+                filteredObjects = demoObjects.filter(obj => 
+                    obj.title.toLowerCase().includes(query) ||
+                    obj.category.toLowerCase().includes(query)
+                );
+            }
+
+            showLoading();
+            setTimeout(() => {
+                displayObjects();
+            }, 500);
+        }
+
+        function clearAllFilters() {
+            // Réinitialiser tous les filtres
+            document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+                input.checked = false;
+            });
+            document.getElementById('cat-all').checked = true;
+            document.getElementById('city-filter').value = '';
+            document.getElementById('search-query').value = '';
+            
+            filteredObjects = [...demoObjects];
+            displayObjects();
+            updateActiveFilters();
+        }
+
+        function updateActiveFilters() {
+            const activeFiltersDiv = document.getElementById('active-filters');
+            const filters = [];
+
+            // Catégories sélectionnées
+            document.querySelectorAll('.category-filter:checked').forEach(f => {
+                const label = document.querySelector(`label[for="${f.id}"]`).textContent.trim();
+                filters.push({ type: 'category', value: f.value, label: label });
+            });
+
+            // Prix sélectionnés
+            document.querySelectorAll('.price-filter:checked').forEach(f => {
+                const label = document.querySelector(`label[for="${f.id}"]`).textContent.trim();
+                filters.push({ type: 'price', value: f.value, label: label });
+            });
+
+            // Conditions sélectionnées
+            document.querySelectorAll('.condition-filter:checked').forEach(f => {
+                const label = document.querySelector(`label[for="${f.id}"]`).textContent.trim();
+                filters.push({ type: 'condition', value: f.value, label: label });
+            });
+
+            // Ville sélectionnée
+            const citySelect = document.getElementById('city-filter');
+            if (citySelect.value) {
+                filters.push({ type: 'city', value: citySelect.value, label: citySelect.value });
+            }
+
+            if (filters.length === 0) {
+                activeFiltersDiv.innerHTML = '';
+                return;
+            }
+
+            activeFiltersDiv.innerHTML = filters.map(filter => 
+                `<span class="filter-badge">
+                    ${filter.label}
+                    <i class="fas fa-times ms-1" onclick="removeFilter('${filter.type}', '${filter.value}')" style="cursor: pointer;"></i>
+                </span>`
+            ).join('');
+        }
+
+        function removeFilter(type, value) {
+            if (type === 'category') {
+                document.getElementById(`cat-${value}`).checked = false;
+            } else if (type === 'price') {
+                document.getElementById(`price-${value}`).checked = false;
+            } else if (type === 'condition') {
+                document.getElementById(`condition-${value}`).checked = false;
+            } else if (type === 'city') {
+                document.getElementById('city-filter').value = '';
+            }
+
+            applyFilters();
+        }
+
+        function updateResultsCount() {
+            document.getElementById('results-count').textContent = 
+                `${filteredObjects.length} objet${filteredObjects.length > 1 ? 's' : ''} trouvé${filteredObjects.length > 1 ? 's' : ''}`;
+        }
+
+        function showLoading() {
+            document.querySelector('.loading-spinner').style.display = 'block';
+            document.getElementById('objects-grid').style.display = 'none';
+            
+            setTimeout(() => {
+                document.querySelector('.loading-spinner').style.display = 'none';
+                document.getElementById('objects-grid').style.display = 'flex';
+            }, 500);
+        }
+
+        // Animation d'entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.object-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
